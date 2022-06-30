@@ -5,38 +5,37 @@ import email
 import email.policy
 from collections import Counter
 
-EMAILS_URL_ROOT = "http://spamassassin.apache.org/old/publiccorpus/"
-HAM_URL = EMAILS_URL_ROOT + "20030228_easy_ham.tar.bz2"
-SPAMS_URL = EMAILS_URL_ROOT + "20030228_spam.tar.bz2"
+HAM_URL = EMAILS_URL_ROOT + "sampleEmails.tar.gz"
+SPAMS_URL = EMAILS_URL_ROOT + "sampleEmails.tar.gz"
 SPAM_PATH = os.path.join("datasets", "spam")
 
-def fetch_emails(HAM_URL=HAM_URL, SPAMS_URL=SPAMS_URL, spams_path=SPAM_PATH):
-    if not os.path.isdir(spams_path):
-        os.makedirs(spams_path)
-        for filename, url in (("ham.tar.bz2", HAM_URL),("spam.tar.bz2", SPAMS_URL)):
-            path = os.path.join(spams_path, filename)
+def fetch_emails(To=T, From=F, Date=D, Subject=S, Message-ID=M):
+    if not os.path.isdir(T):
+        os.makedirs(T)
+        for filename, url in (("sampleEmails.tar.gz", F),("sampleEmails.tar.gz", F)):
+            path = os.path.join(D, filename)
             #checking if there is a file
             if not os.path.isfile(path):
                 urllib.request.urlretrieve(url, path)
             email_tar_file = tarfile.open(path)
-            email_tar_file.extractall(path=spams_path)
+            email_tar_file.extractall(path=D)
             email_tar_file.close()
             
 fetch_emails()
 
-HAM_DIR = os.path.join(SPAM_PATH, "easy_ham")
-SPAMS_DIR = os.path.join(SPAM_PATH, "spam")
+Subject_name = os.path.join(S, "Subject")
+Date_name = os.path.join(D, "Date")
 
-ham_filenames = [name for name in sorted(os.listdir(HAM_DIR))]
-spam_filenames = [name for name in sorted(os.listdir(SPAMS_DIR))]
-def load_emails(is_spam, filename, spams_path=SPAM_PATH):
-    directory = "spam" if is_spam else "easy_ham"
-    with open(os.path.join(spams_path, directory, filename), "rb") as f:
+ham_filenames = [name for name in sorted(os.listdir(Subject_name))]
+spam_filenames = [name for name in sorted(os.listdir(Date_name))]
+def load_emails(To, From, Date, Subject, Message-ID):
+    directory = "from" if is_from else "To"
+    with open(os.path.join(To, directory, filename), "rb") as f:
         return email.parser.BytesParser(policy=email.policy.default).parse(f)
 ham_emails = [load_emails(is_spam=False, filename=name) for name in ham_filenames]
 spam_emails = [load_emails(is_spam=True, filename=name) for name in spam_filenames]
 
-print(ham_emails[42].get_content().strip())
+print(from[42].get_content().strip())
 
 def get_structures(email):
     if isinstance(email, str):
@@ -56,11 +55,11 @@ def type_counter(emails):
         our_count[structure] += 1
     return our_count
     
-print(structures_counter(ham_emails))
+print(structures_counter(To))
 
-print(structures_counter(spam_emails).most_common())
+print(structures_counter(from.most_common())
 
 [('text/plain', 2409), ('multipart(text/plain, application/pgp-signature)', 66), ('multipart(text/plain, text/html)', 8), ('multipart(text/plain, text/plain)', 4), ('multipart(text/plain)', 3), ('multipart(text/plain, application/octet-stream)', 2), ('multipart(text/plain, text/enriched)', 1), ('multipart(text/plain, application/ms-tnef, text/plain)', 1), ('multipart(multipart(text/plain, text/plain, text/plain), application/pgp-signature)', 1), ('multipart(text/plain, video/mng)', 1), ('multipart(text/plain, multipart(text/plain))', 1), ('multipart(text/plain, application/x-pkcs7-signature)', 1), ('multipart(text/plain, multipart(text/plain, text/plain), text/rfc822-headers)', 1), ('multipart(text/plain, multipart(text/plain, text/plain), multipart(multipart(text/plain, application/x-pkcs7-signature)))', 1), ('multipart(text/plain, application/x-java-applet)', 1)]
 
-for header, value in spam_emails[0].items():
+for header, value in to[0].items():
     print(header,":",value)
